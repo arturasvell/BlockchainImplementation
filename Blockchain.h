@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <ctime>
 using namespace std;
+
 class Block {
 public:
     string hashCreated;
@@ -20,6 +21,7 @@ public:
     Block(short indexInput, const string &dataInput);
     Block(short indexInput, vector<Transaction> blockDataInput);
     void MineBlock(short difficultyTarget);
+    void doubleTimeLimit();
 private:
     short index;
     short nonce;

@@ -3,7 +3,7 @@
 //
 
 #include "Blockchain.h"
-
+static int timeLimit=5;
 Blockchain::Blockchain()
 {
     blockVector.emplace_back(Block(0, "Genesis Block"));
@@ -33,8 +33,13 @@ Block::Block(short indexInput, vector<Transaction> blockDataInput):index(indexIn
     timeElapsed = time(nullptr);
     hashCreated = BuildHash();
 }
+void Block::doubleTimeLimit()
+{
+    timeLimit*=2;
+}
 void Block::MineBlock(short difficultyTarget)
 {
+    time_t timeStart=clock();
     char charArray[difficultyTarget + 1];
     for (short i = 0; i < difficultyTarget; ++i)
     {
@@ -43,14 +48,16 @@ void Block::MineBlock(short difficultyTarget)
     charArray[difficultyTarget] = '\0';
 
     string str(charArray);
-
     do
     {
         nonce++;
         hashCreated = BuildHash();
     }
-    while (hashCreated.substr(0, difficultyTarget) != str);
-
+    while (hashCreated.substr(0, difficultyTarget) != str&&(clock()-timeStart/CLOCKS_PER_SEC<timeLimit));
+    if(hashCreated.substr(0, difficultyTarget) != str)
+    {
+        hashCreated="";
+    }
     cout << "Block mined: " << hashCreated << endl;
 }
 
