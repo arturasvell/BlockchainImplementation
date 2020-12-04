@@ -17,3 +17,4 @@ An implementation of a simple Blockchain, POW method and a Merkle Hash Tree by y
 
 # Screenshot of results
 
+![Image of results]()
