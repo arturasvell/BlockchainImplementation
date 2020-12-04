@@ -47,7 +47,7 @@ void CreateTransactions()
     {
         transaction.receiver_key=users[rand()%users.size()].public_key;
         transaction.sender_key=users[rand()%users.size()].public_key;
-        transaction.sum=rand()%100000;
+        transaction.sum=rand()%10000;
         transaction.transactionID=transaction.CreateHashTrans();
         transactions.push_back(transaction);
     }
