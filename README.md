@@ -10,5 +10,10 @@ An implementation of a simple Blockchain, POW method and a Merkle Hash Tree by y
 - If a hash hasn't been found, and all candidates have been removed, the vector is repopulated with the same candidates, which now have twice the amount of attempts to successfully mine.
 - After the block is mined, the transactions are completed and subsequently removed from the shared pool.
 - Repeat until no transactions remain.
+  
+# How to compile
+
+*g++ -std=c++11 -o merkle main.cpp Blockchain.cpp transactionClass.cpp userClass.cpp functions/functions.cpp $(pkg-config --cflags --libs libbitcoin)*
 
 # Screenshot of results
+
