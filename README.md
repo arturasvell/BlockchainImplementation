@@ -18,3 +18,10 @@ An implementation of a simple Blockchain, POW method and a Merkle Hash Tree by y
 # Screenshot of results
 
 ![Image of results](https://github.com/arturasvell/BlockchainImplementation/blob/v0.3/results.png)
+
+# Version v0.3
+
+- Added Libbitcoin Merkle Tree realisation
+- Fixed README
+- Fixed Block-candidate system
+- Added visual output
