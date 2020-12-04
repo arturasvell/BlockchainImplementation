@@ -11,22 +11,23 @@
 #include "userClass.h"
 #include <cstdlib>
 #include <ctime>
+#include <bitcoin/bitcoin.hpp>
 using namespace std;
-
 class Block {
 public:
     string hashCreated;
     string merkleRootHash; ///to be added
     string tailHash;
+    int mine_times=100000;
     Block(short indexInput, const string &dataInput);
     Block(short indexInput, vector<Transaction> blockDataInput);
+    vector<Transaction> blockData;
     void MineBlock(short difficultyTarget);
-    void doubleTimeLimit();
 private:
     short index;
     short nonce;
     string version;
-    vector<Transaction> blockData;
+
     string hashData;
     time_t timeElapsed;
 

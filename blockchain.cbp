@@ -37,9 +37,6 @@
 		<Unit filename="functions/functions.cpp" />
 		<Unit filename="functions/functions.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="merkleTree.h">
-			<Option compile="1" />
-		</Unit>
 		<Unit filename="transactionClass.cpp" />
 		<Unit filename="transactionClass.h" />
 		<Unit filename="userClass.cpp" />

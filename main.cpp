@@ -2,20 +2,21 @@
 #include "transactionClass.h"
 #include "userClass.h"
 #include "functions/functions.h"
-#include "merkleTree.h"
+#include <algorithm>
 using namespace std;
 vector<UserClass> users;
 vector<Transaction> transactions;
 void CreateUsers();
 void CreateTransactions();
-void CreateCandidates();
 void CreateBlockToAdd();
-void Validate(vector<Transaction> &transPool);
-Blockchain bChain;
-int counter=0;
+void TakeRandomTransactions(vector<Transaction> &pool);
+int FindUserIndexByKey(string key);
+int ReturnRandomIndex(int vectorSize);
+void PopulateCandidate(vector<Transaction> &pool, vector<Transaction> &candidate);
+Blockchain bChain = Blockchain();
+int blockIndex=1;
 int main()
 {
-
     srand(time(NULL));
     CreateUsers();
     CreateTransactions();
@@ -23,134 +24,127 @@ int main()
     {
         CreateBlockToAdd();
     }
+
+    return 0;
 }
 void CreateUsers()
 {
-    for(int i=0; i<1000; i++)
+    UserClass user;
+    for(int i=0;i<1000;i++)
     {
-        UserClass user;
-        user.name="Vardenis Pavardenis "+to_string(i);
-        user.balance=rand()%10000;
-        user.public_key=ArturoHash(to_string(user.balance)+user.name);
-        users.push_back(user);
+
+        user.name="Vardenis Pavardenis-"+to_string(i);
+        user.public_key=ArturoHash(user.name);
+        user.balance=rand()%1000000;
     }
+    users.push_back(user);
     cout<<"Created users."<<endl;
 }
 void CreateTransactions()
 {
-    for(int i=0; i<10000; i++)
+    Transaction transaction;
+    for(int i=0;i<10000;i++)
     {
-        Transaction transaction;
-        transaction.sender_key=users[rand()%users.size()].public_key;
         transaction.receiver_key=users[rand()%users.size()].public_key;
-        transaction.sum=rand()%10000;
+        transaction.sender_key=users[rand()%users.size()].public_key;
+        transaction.sum=rand()%100000;
         transaction.transactionID=transaction.CreateHashTrans();
+        transactions.push_back(transaction);
     }
     cout<<"Created transactions"<<endl;
 }
-void Validate(vector<Transaction> &transPool)
+void CreateBlockToAdd()
 {
-    for(int i=0; i<transPool.size(); i++)
+    vector<Transaction> poolA,poolB,poolC,poolD,poolE;
+    TakeRandomTransactions(poolA);
+    TakeRandomTransactions(poolB);
+    TakeRandomTransactions(poolC);
+    TakeRandomTransactions(poolD);
+    TakeRandomTransactions(poolE);
+    Block blockA=Block(blockIndex,poolA),blockB=Block(blockIndex,poolB),blockC=Block(blockIndex,poolC)
+    ,blockD=Block(blockIndex,poolD),blockE=Block(blockIndex,poolE);
+    cout<<"Candidates generated."<<endl;
+    vector<Block> blockCandidates;
+    blockCandidates.push_back(blockA);
+    blockCandidates.push_back(blockB);
+    blockCandidates.push_back(blockC);
+    blockCandidates.push_back(blockD);
+    blockCandidates.push_back(blockE);
+    vector<Block> copyCandidates=blockCandidates;
+    int indexToSave;
+    while(true)
     {
-        int senderIndex,receiverIndex;
-        for(int j=0; j<users.size(); j++)
+        if(copyCandidates.size()==0)
         {
-            if(users[j].public_key==transPool[i].sender_key)
+            copyCandidates=blockCandidates;
+            for(int i=0;i<copyCandidates.size();i++)
             {
-                senderIndex=j;
-            }
-            else if(users[j].public_key==transPool[i].receiver_key)
-            {
-                receiverIndex=j;
+                copyCandidates[i].mine_times*=2;
             }
         }
-        if(users[senderIndex].balance-transPool[i].sum>=0&&transPool[i].transactionID==ArturoHash(transPool[i].sender_key+transPool[i].receiver_key+to_string(transPool[i].sum)))
+        int randomIndex=rand()%5;
+        copyCandidates[randomIndex].MineBlock(1);
+        if(copyCandidates[randomIndex].hashCreated=="-1")
         {
-
+            copyCandidates.erase(copyCandidates.begin()+randomIndex);
         }
         else
         {
-            transPool.erase(transPool.begin(),transPool.begin()+i);
-        }
-    }
-}
-void CreateBlockToAdd()
-{
-    vector<vector<Transaction>> candidates;
-    vector<Transaction> a1,b1,c1,d1,e1;
-    BinaryHashTree tree1,tree2,tree3,tree4,tree5;
-    for(int i=0; i<100; i++)
-    {
-        int randIndex=rand()%transactions.size();
-        a1.push_back(transactions[randIndex]);
-    }
-    Validate(a1);
-    tree1.build(a1);
-    candidates.push_back(a1);
-    for(int i=0; i<100; i++)
-    {
-        int randIndex=rand()%transactions.size();
-        b1.push_back(transactions[randIndex]);
-    }
-    Validate(b1);
-    tree2.build(b1);
-    candidates.push_back(b1);
-    for(int i=0; i<100; i++)
-    {
-        int randIndex=rand()%transactions.size();
-        c1.push_back(transactions[randIndex]);
-    }
-    Validate(c1);
-    tree3.build(c1);
-    candidates.push_back(c1);
-    for(int i=0; i<100; i++)
-    {
-        int randIndex=rand()%transactions.size();
-        d1.push_back(transactions[randIndex]);
-    }
-    Validate(d1);
-    tree4.build(d1);
-    candidates.push_back(d1);
-    for(int i=0; i<100; i++)
-    {
-        int randIndex=rand()%transactions.size();
-        e1.push_back(transactions[randIndex]);
-    }
-    Validate(e1);
-    tree5.build(e1);
-    candidates.push_back(e1);
-    int difficultyTarget=0;
-    vector<vector<Transaction>> candidatesCopy=candidates;
-    while(true)
-    {
-        int indexOfChoice=rand()%candidatesCopy.size();
-        vector<Transaction> attempt=candidatesCopy[indexOfChoice];
-        Block blockTest(counter,attempt);
+            cout<<"Block with "<<copyCandidates[randomIndex].blockData.size()<<" transactions with HASH \n"<<copyCandidates[randomIndex].hashCreated<<" found. Good job!"<<endl;
+            bChain.AddBlock(copyCandidates[randomIndex]);
+            cout<<copyCandidates[randomIndex].blockData[0].transactionID<<endl;
 
-        if(indexOfChoice==0)
-            blockTest.merkleRootHash=ArturoHash(tree1.root->hashValue);
-        else if(indexOfChoice==1)
-            blockTest.merkleRootHash=ArturoHash(tree2.root->hashValue);
-        else if(indexOfChoice==2)
-            blockTest.merkleRootHash=ArturoHash(tree3.root->hashValue);
-        else if(indexOfChoice==3)
-            blockTest.merkleRootHash=ArturoHash(tree4.root->hashValue);
-        else if(indexOfChoice==4)
-            blockTest.merkleRootHash=ArturoHash(tree5.root->hashValue);
-        blockTest.MineBlock(0);
-        if(blockTest.hashCreated=="")
+
+            indexToSave=randomIndex;
+            blockIndex++;
+            break;
+        }
+
+    }
+    vector<Transaction> toRemove=copyCandidates[indexToSave].blockData;
+    for(int i=0;i<toRemove.size();i++)
+    {
+        for(int j=0;j<transactions.size();j++)
         {
-            if(candidatesCopy.size()>0)
+            if(toRemove[i].transactionID==transactions[j].transactionID)
             {
-                candidatesCopy.erase(candidatesCopy.begin(),candidatesCopy.begin()+indexOfChoice);
+                transactions.erase(transactions.begin()+j);
             }
-            else
-            {
-                candidatesCopy=candidates;
-                blockTest.doubleTimeLimit();
-            }
-            continue;
         }
     }
+    cout<<"REMAINING TRANSACTIONS - "<<transactions.size()<<endl;
+}
+void TakeRandomTransactions(vector<Transaction> &pool)
+{
+    for(int i=0;i<100;i++)
+    {
+        int indexToTake=ReturnRandomIndex(transactions.size());
+        pool.push_back(transactions[indexToTake]);
+    }
+    for(int i=0;i<pool.size();i++)
+    {
+        int sender_Index=FindUserIndexByKey(pool[i].sender_key);
+        int receiver_Index=FindUserIndexByKey(pool[i].receiver_key);
+        string hashCheck=ArturoHash(pool[i].sender_key+pool[i].receiver_key+to_string(pool[i].sum));
+        if(users[sender_Index].balance-pool[i].sum<0||pool[i].transactionID!=hashCheck)
+        {
+            pool.erase(pool.begin()+i);
+            i=-1;
+        }
 
+    }
+    cout<<"TRANSACTION STATUS: "<<pool.size()<<" transactions left after cleanup."<<endl;
+}
+
+int ReturnRandomIndex(int vectorSize)
+{
+    return rand()%transactions.size();
+}
+int FindUserIndexByKey(string key)
+{
+    for(int i=0;i<users.size();i++)
+    {
+        if(key==users[i].public_key)
+            return i;
+    }
 }

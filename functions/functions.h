@@ -31,5 +31,6 @@ const unsigned int k[64] = {
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 string ArturoHash(string inputString);
+void reverseStr(string& str);
 
 #endif // FUNCTIONS_H_INCLUDED
